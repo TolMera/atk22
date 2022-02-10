@@ -1,0 +1,20 @@
+{
+  "name": "advanced-testing-kit",
+  "version": "1.0.0",
+  "description": "An advanced testing suite of tools. Machine Learning enhanced testing kit.",
+  "main": "index.js",
+  "author": "Bjorn Macintosh <bjorn.macintosh@gmail.com> (http://tolmera.com)",
+  "license": "SEE LICENSE IN LICENSE.md\"",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": ">=17.0.15"
+  },
+  "dependencies": {
+    "escodegen": "^2.0.0",
+    "esprima": "^4.0.1",
+    "espurify": "^2.1.1",
+    "esvalid": "^1.1.0"
+  }
+}
