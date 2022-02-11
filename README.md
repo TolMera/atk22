@@ -45,6 +45,4 @@ try {
 } catch (e) {
     console.error('Function isPrime is not running as expected');
 }
-
-
 ```
