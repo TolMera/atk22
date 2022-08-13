@@ -89,16 +89,34 @@ const { throws } = require("assert");
 const expectExport = require("expect");
 const stringToFunction = require("./stringToFunction");
 
-function makeTests(
-    fn,
-    params
-) {
-    this.output = [];
+const output: any[] = [];
+
+export function makeTests(
+    fn: Function,
+    params: {
+        inputs: Array<{ value: any, rules?: Array<string>, generator?: Function }>,
+        returns: Array<[any, boolean]>,
+        advanced?: {
+            harness?: boolean,
+            iterations?: number,
+            tests?: Array<{
+                input: Array<any>,
+                result: Array<boolean>,
+                calls: Array<{
+                    fn: string,
+                    with: Array<[any, string, boolean]>,
+                    returns: Array<boolean>,
+                    count: number
+                }>
+            }>
+        }
+    }
+): any {
     // Executing this at config time, since it would suck to get an error elsewhere, that relates to the params you passed in to setting up this method.
     testParamInputsAreNotBroken(params);
 
     return () => {
-        const runs = [];
+        const runs: [Function, unknown, unknown, unknown][] = [];
         try {
             if (params?.returns) runs.push(...testFnWithUserExpectedReturns(params, fn));
             if (params?.advanced?.tests) runs.push(...testFnWithParamsAdvancedTests(params, fn));
@@ -114,8 +132,8 @@ function makeTests(
     }
 }
 
-const automatedTestingWithGeneratorsFromParamsInputs = (params, fn) => {
-    const runs = [];
+const automatedTestingWithGeneratorsFromParamsInputs = (params: any, fn: Function) => {
+    const runs: [Function, unknown, unknown, unknown][] = [];
 
     for (const inputs of params.inputs) {
 
@@ -124,7 +142,7 @@ const automatedTestingWithGeneratorsFromParamsInputs = (params, fn) => {
             const thisLoopsArgs = getArgs(fnArgs);
 
             try {
-                let dPoint = [];
+                let dPoint: unknown[] = [];
 
                 // if (testset.calls && testset.calls?.length) {
                 //     globalThis.emitter.on('dPoint', ((event) => {
@@ -140,7 +158,7 @@ const automatedTestingWithGeneratorsFromParamsInputs = (params, fn) => {
 
                 runs.push([fn, thisLoopsArgs, realResult, dPoint]);
 
-                // this.output.push({ result: realResult, dPoint });
+                output.push({ result: realResult, dPoint });
             } catch (e) {
                 throw new Error(`The function under test throws an error when passed the input ${thisLoopsArgs.toString()} - throws with ${e}`);
             }
@@ -150,18 +168,18 @@ const automatedTestingWithGeneratorsFromParamsInputs = (params, fn) => {
     return runs;
 }
 
-const getArgs = (fnArgs) => {
-    const thisLoopsArgs = [];
-    for (let generator of fnArgs) {
+const getArgs = (fnArgs: Generator[]) => {
+    const thisLoopsArgs: any[] = [];
+    for (const generator of fnArgs) {
         thisLoopsArgs.push(generator.next().value);
     }
     return thisLoopsArgs;
 }
 
-const makeGeneratorsAndFixedValsConsistent = (inputs) => {
-    const fnArgs = [];
+const makeGeneratorsAndFixedValsConsistent = (inputs: any) => {
+    const fnArgs: any[] = [];
     // Make it consistent so there is no difference between a generator and a fixed value;
-    for (let index in inputs) {
+    for (const index in inputs) {
         if (inputs[index]?.generator) {
             fnArgs.push(inputs[index].generator());
         }
@@ -175,7 +193,7 @@ const makeGeneratorsAndFixedValsConsistent = (inputs) => {
     return fnArgs;
 }
 
-const testParamInputsAreNotBroken = (params) => {
+const testParamInputsAreNotBroken = (params: any) => {
     if (params?.inputs && params.inputs.length) for (const inputs of params.inputs) {
         /* {
             type: Number
@@ -184,7 +202,7 @@ const testParamInputsAreNotBroken = (params) => {
         } OR {
             value: ....
         }*/
-        for (input of inputs) {
+        for (const input of inputs) {
             const usesValue = Object.keys(input).includes('value');
             if (!usesValue
                 && typeof input?.generator === 'function') {
@@ -198,14 +216,14 @@ const testParamInputsAreNotBroken = (params) => {
                 } catch (e) {
                     // The generator throws an issue - what do we do then?
                 }
-            } else if (!usesValue &&  typeof input?.generator !== 'function' ) {
+            } else if (!usesValue && typeof input?.generator !== 'function') {
                 throw new Error("'Value' OR 'Generator' MUST be past to make use of params: {input: ... }");
             }
         }
     }
 }
 
-const testGeneratorAgainstRules = (input, test) => {
+const testGeneratorAgainstRules = (input: any, test: any): void => {
     for (let rule of input.rules) {
         let testFnString = `(test) => {
                                 if (test ${rule}) return true;
@@ -217,8 +235,8 @@ const testGeneratorAgainstRules = (input, test) => {
     }
 }
 
-const testFnWithParamsAdvancedTests = (params, fn) => {
-    const runs = [];
+const testFnWithParamsAdvancedTests = (params: any, fn: Function) => {
+    const runs: [Function, unknown, unknown, unknown][] = [];
     for (let testset of params.advanced.tests) {
         if (testset.calls && testset.calls?.length) {
             const harness = require('./harness');
@@ -231,8 +249,8 @@ const testFnWithParamsAdvancedTests = (params, fn) => {
     return runs;
 }
 
-const testWithAdvancedParams = (testset, fn) => {
-    const runs = [];
+const testWithAdvancedParams = (testset: any, fn: Function) => {
+    const runs: [Function, unknown, unknown, unknown][] = [];
     for (let index in testset.input) {
         const input = testset.input[index];
         const expectedResult = testset.result[index];
@@ -251,19 +269,20 @@ const testWithAdvancedParams = (testset, fn) => {
             const realResult = fn(...input);
             runs.push([fn, input, realResult, expectedResult]);
 
-            if (typeof expects == 'function') {
-                if (!expects(response)) {
-                    throws = new Error('User supplied result validation does not pass');
-                }
-            }
-            else if (expectExport(realResult).toEqual(expectedResult)) {
+            // if (typeof expects == 'function') {
+            //     if (!expects(response)) {
+            //         throws = new Error('User supplied result validation does not pass');
+            //     }
+            // }
+            // else 
+            if (expectExport(realResult).toEqual(expectedResult)) {
                 throws = new Error('Advanced params for function returned an unexpected result');
             }
 
             /* if (testset.calls && testset.calls?.length) {
                 globalThis.emitter.removeListener('dPoint', dPointListener);
             }
-            this.output.push({ result: realResult, dPoint }); */
+            output.push({ result: realResult, dPoint }); */
         } catch (e) {
             throw new Error(`Function under test threw an error while using user provided inputs - Error: ${e}`);
         }
@@ -287,8 +306,8 @@ const testWithAdvancedParams = (testset, fn) => {
     return runs;
 }
 
-const testFnWithUserExpectedReturns = (params, fn) => {
-    const runs = [];
+const testFnWithUserExpectedReturns = (params: any, fn: Function): [Function, unknown, unknown, unknown][] => {
+    const runs: [Function, unknown, unknown, unknown][] = [];
     for (let test of params.returns) {
         let expects = test.pop();
         const response = fn(...test[0]);
@@ -308,5 +327,3 @@ const testFnWithUserExpectedReturns = (params, fn) => {
     }
     return runs;
 }
-
-module.exports = makeTests;

@@ -1,20 +1,23 @@
-const nl = require('numbers-logic');
-const { safeRandomArithmeticInteger } = require('./lib/numberGenerators');
+import * as nl from 'numbers-logic';
+import { harness } from '../lib/harness';
+import { makeTests } from '../lib/makeTests';
+import { safeRandomArithmeticInteger } from '../lib/numberGenerators';
 
-function testHarness() {
+export function testHarness() {
     const newFn = harness(nl.isPrime);
 
     for (let x = 0; x < 10; x++) {
         console.log(newFn(x));
     }
 }
+
 try {
     testHarness();
 } catch (e) {
     console.error(e);
 }
 
-function testMakeTest() {
+export function testMakeTest() {
     const testIsPrime = makeTests(
         nl.isPrime,
         {

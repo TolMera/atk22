@@ -1,5 +1,5 @@
-function getInputsForFunction(rootCodeBlock) {
-    const input = [];
+export function getInputsForFunction(rootCodeBlock) {
+    const input: string[] = [];
     let params;
     if (rootCodeBlock?.body?.[0]?.expression?.params) {
         params = rootCodeBlock.body[0].expression.params;
@@ -11,5 +11,3 @@ function getInputsForFunction(rootCodeBlock) {
     }
     return input;
 }
-
-module.exports = getInputsForFunction;

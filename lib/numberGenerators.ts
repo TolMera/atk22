@@ -1,4 +1,4 @@
-const safeRandomArithmeticInteger = function* () {
+export const safeRandomArithmeticInteger = function* () {
     while (true) {
         let num = (Math.random() * Number.MAX_SAFE_INTEGER / 1000000000 /* Number.MAX_SAFE_INTEGER */).toFixed(0);
         if (Number.isSafeInteger(Number(num)) && Number.isInteger(Number(num))) {
@@ -7,8 +7,8 @@ const safeRandomArithmeticInteger = function* () {
     }
 }
 
-const safePositiveInteger = safeRandomArithmeticInteger;
-const safeNegativeInteger = function* () {
+export const safePositiveInteger = safeRandomArithmeticInteger;
+export const safeNegativeInteger = function* () {
     while (true) {
         let num = (Math.random() * Number.MIN_SAFE_INTEGER / 1000000000 /* Number.MAX_SAFE_INTEGER */).toFixed(0);
         if (Number.isSafeInteger(Number(num)) && Number.isInteger(Number(num))) {
@@ -17,7 +17,7 @@ const safeNegativeInteger = function* () {
     }
 }
 
-const safeRandomSignedInteger = function* () {
+export const safeRandomSignedInteger = function* () {
     while (true) {
         // Expand range from 0 to 1 into -1 to 1
         const rand = ((Math.random() * 2) - 1);
@@ -33,19 +33,10 @@ const safeRandomSignedInteger = function* () {
     }
 }
 
-const safeRandomUnsignedInteger = safeRandomArithmeticInteger;
+export const safeRandomUnsignedInteger = safeRandomArithmeticInteger;
 
-const randomFloat = function* () {
+export const randomFloat = function* () {
     while (true) {
         yield ((Math.random() * 2) - 1);
     }
-}
-
-module.exports = {
-    safeRandomArithmeticInteger,
-    safeRandomSignedInteger,
-    safeRandomUnsignedInteger,
-    randomFloat,
-    safePositiveInteger,
-    safeNegativeInteger
 }
