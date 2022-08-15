@@ -1,32 +1,41 @@
 {
-  "name": "advanced-testing-kit",
-  "author": "Bjorn Macintosh <bjorn.macintosh@gmail.com> (http://tolmera.com)",
-  "license": "custom",
-  "description": "An advanced testing suite of tools. Machine Learning enhanced testing kit.",
-  "version": "1.0.0",
-  "homepage": "https://github.com/TolMera/advanced-testing-kit",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/TolMera/advanced-testing-kit.git"
-  },
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "devDependencies": {
-    "@types/escodegen": "^0.0.7",
-    "@types/esprima": "^4.0.3",
-    "@types/estraverse": "^5.1.1",
-    "@types/node": ">=17.0.15"
-  },
-  "dependencies": {
-    "escodegen": "^2.0.0",
-    "esprima": "^4.0.1",
-    "espurify": "^2.1.1",
-    "esvalid": "^1.1.0",
-    "expect": "^27.5.1",
-    "get-object": "^0.2.0",
-    "numbers-logic": "^1.1.0",
-    "set-value": "^4.1.0"
-  }
+	"name": "advanced-testing-kit",
+	"author": "Bjorn Macintosh <bjorn.macintosh@gmail.com> (http://tolmera.com)",
+	"license": "custom",
+	"description": "An advanced testing suite of tools. Machine Learning enhanced testing kit.",
+	"version": "1.0.0",
+	"homepage": "https://github.com/TolMera/advanced-testing-kit",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/TolMera/advanced-testing-kit.git"
+	},
+	"files": [
+		"build"
+	],
+	"main": "index.js",
+	"scripts": {
+		"build": "npm run deleteBuild && npm run pretty && npm run compile",
+		"deleteBuild": "rm -rf ./build",
+		"pretty": "node ./node_modules/prettier/bin-prettier.js --write . --use-tabs",
+		"compile": "tsc",
+		"start": "ts-node index.ts",
+		"test": "for file in ./testing/*; do echo $file && time ts-node $file || exit 1; done;"
+	},
+	"devDependencies": {
+		"@types/escodegen": "^0.0.7",
+		"@types/esprima": "^4.0.3",
+		"@types/estraverse": "^5.1.1",
+		"@types/node": ">=17.0.15",
+		"prettier": "^2.7.1"
+	},
+	"dependencies": {
+		"escodegen": "^2.0.0",
+		"esprima": "^4.0.1",
+		"espurify": "^2.1.1",
+		"esvalid": "^1.1.0",
+		"expect": "^27.5.1",
+		"get-object": "^0.2.0",
+		"numbers-logic": "^1.1.0",
+		"set-value": "^4.1.0"
+	}
 }
