@@ -1,4 +1,4 @@
-export function getInputsForFunction(rootCodeBlock) {
+export function getInputsForFunction(rootCodeBlock: any): string[] {
 	const input: string[] = [];
 	let params;
 	if (rootCodeBlock?.body?.[0]?.expression?.params) {

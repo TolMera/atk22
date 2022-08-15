@@ -1,7 +1,7 @@
-import * as esprima from "esprima";
-import * as escodegen from "escodegen";
-import * as estraverse from "estraverse";
-import * as espurify from "espurify";
+import { Program, parseScript } from "esprima";
+import { generate } from "escodegen";
+import { traverse, VisitorOption } from "estraverse";
+import espurify from "espurify";
 import { stringToFunction } from "./stringToFunction";
 import { EventEmitter } from "stream";
 
@@ -9,7 +9,7 @@ export const harness = (fn: Function): Function => {
 	makeSureGlobalThisHasEmitter();
 
 	const fnString = fn.toString();
-	let rootCodeBlock: esprima.Program = esprima.parseScript(fnString);
+	let rootCodeBlock: Program = parseScript(fnString);
 
 	try {
 		(rootCodeBlock.body[0] as any).expression.body = [];
@@ -27,7 +27,7 @@ export const harness = (fn: Function): Function => {
 		(rootCodeBlock.body[0] as any).body.body = codeBlocks;
 	}
 
-	const genCode = escodegen.generate(espurify(rootCodeBlock));
+	const genCode = generate(espurify(rootCodeBlock));
 	return stringToFunction(genCode);
 };
 
@@ -40,15 +40,15 @@ const makeSureGlobalThisHasEmitter = () => {
 const getVariablesFromFn = (fnString: string): string[] => {
 	let variables: Set<string> = new Set();
 	try {
-		let ast = esprima.parseScript(fnString);
+		let ast = parseScript(fnString);
 
-		estraverse.traverse(ast, {
+		traverse(ast, {
 			enter: function (node, parent) {
 				if (
 					node.type == "FunctionExpression" ||
 					node.type == "FunctionDeclaration"
 				) {
-					return estraverse.VisitorOption.Skip;
+					return VisitorOption.Skip;
 				}
 			},
 			// TODO: Add to this for any addition/subtraction from Sets or Push and Pop from/to an array.  Any anything else taht's going to be changing the content of a variable.
@@ -74,12 +74,12 @@ const requiredMethods = () => {
 };
 
 const attachHarnessPoints = (code: string, variables: unknown[]) => {
-	const vars = getVariablesFromFn(escodegen.generate(code));
-	const lines: esprima.Program[] = [];
+	const vars = getVariablesFromFn(generate(code));
+	const lines: Program[] = [];
 	for (const value of vars) {
 		if (variables.includes(value)) {
 			lines.push(
-				esprima.parseScript(`try {dPoint("${value}", ${value}); } catch (e) {}`)
+				parseScript(`try {dPoint("${value}", ${value}); } catch (e) {}`)
 			);
 		}
 	}
@@ -91,13 +91,13 @@ const dPoint = function (varName: string, varValue: unknown) {
 };
 
 function getCodeBlocks(fnString: string, variables: string[]) {
-	let codeBlocks: esprima.Program[] = [];
-	codeBlocks.push(esprima.parseScript(requiredMethods()));
+	let codeBlocks: Program[] = [];
+	codeBlocks.push(parseScript(requiredMethods()));
 	let codeChunks;
-	if ((esprima.parseScript(fnString)?.body?.[0] as any)?.expression?.body) {
-		codeChunks = (esprima.parseScript(fnString).body[0] as any).expression.body;
+	if ((parseScript(fnString)?.body?.[0] as any)?.expression?.body) {
+		codeChunks = (parseScript(fnString).body[0] as any).expression.body;
 	} else {
-		codeChunks = (esprima.parseScript(fnString).body[0] as any).body.body;
+		codeChunks = (parseScript(fnString).body[0] as any).body.body;
 	}
 	for (const code of codeChunks) {
 		codeBlocks.push(code);

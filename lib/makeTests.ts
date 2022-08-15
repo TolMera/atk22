@@ -91,27 +91,31 @@ const stringToFunction = require("./stringToFunction");
 
 const output: any[] = [];
 
-export function makeTests(
-	fn: Function,
-	params: {
-		inputs: Array<{ value: any; rules?: Array<string>; generator?: Function }>;
-		returns: Array<[any, boolean]>;
-		advanced?: {
-			harness?: boolean;
-			iterations?: number;
-			tests?: Array<{
-				input: Array<any>;
-				result: Array<boolean>;
-				calls: Array<{
-					fn: string;
-					with: Array<[any, string, boolean]>;
-					returns: Array<boolean>;
-					count: number;
-				}>;
-			}>;
-		};
-	}
-): any {
+interface makeTestParams {
+	inputs: Array<{
+		type?: string;
+		value?: any;
+		rules?: Array<string>;
+		generator?: Function;
+	}>;
+	returns: Array<[any, boolean]>;
+	advanced?: {
+		harness?: boolean;
+		iterations?: number;
+		tests?: Array<{
+			input: Array<any>;
+			result: Array<boolean>;
+			calls?: {
+				fn: string;
+				with: Array<[any, string, boolean]>;
+				returns: Array<boolean>;
+				count: number;
+			}[];
+		}>;
+	};
+}
+
+export function makeTests(fn: Function, params: makeTestParams): any {
 	// Executing this at config time, since it would suck to get an error elsewhere, that relates to the params you passed in to setting up this method.
 	testParamInputsAreNotBroken(params);
 

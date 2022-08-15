@@ -1,10 +1,11 @@
-import * as nl from "numbers-logic";
+import { index } from "numbers-logic";
+const { isPrime } = index;
 import { harness } from "../lib/harness";
 import { makeTests } from "../lib/makeTests";
 import { safeRandomArithmeticInteger } from "../lib/numberGenerators";
 
 export function testHarness() {
-	const newFn = harness(nl.isPrime);
+	const newFn = harness(isPrime);
 
 	for (let x = 0; x < 10; x++) {
 		console.log(newFn(x));
@@ -18,7 +19,7 @@ try {
 }
 
 export function testMakeTest() {
-	const testIsPrime = makeTests(nl.isPrime, {
+	const testIsPrime = makeTests(isPrime, {
 		// The testkit will test these values FIRST to make sure your input is returning your expected output.
 		returns: [
 			[2, true],
@@ -35,7 +36,7 @@ export function testMakeTest() {
 		// The testkit will then move onto performing programatic tests using the rules you have dictated for the input
 		inputs: [
 			{
-				type: Number,
+				type: "Number",
 				generator: safeRandomArithmeticInteger,
 				// rules: ['> 0']
 			},

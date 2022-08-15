@@ -35,7 +35,8 @@
 		"esvalid": "^1.1.0",
 		"expect": "^27.5.1",
 		"get-object": "^0.2.0",
-		"numbers-logic": "^1.1.0",
+		"number-theory": "^1.1.0",
+		"numbers-logic": "^1.3.0",
 		"set-value": "^4.1.0"
 	}
 }
